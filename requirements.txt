@@ -1,26 +1,24 @@
-# simply-systems-api/requirements.txt
-# Core Flask & extensions
+# simply-plural-backend/requirements.txt
 Flask==3.0.3
 Flask-SQLAlchemy==3.1.1
 Flask-JWT-Extended==4.6.0
 Flask-CORS==5.0.0
 Flask-SocketIO==5.3.6
+python-socketio==5.11.4
+bcrypt==4.2.0
+python-dotenv==1.0.1
 Flask-Migrate==4.1.0
+alembic==1.13.1
 
-# Production web server (required on Render)
+# Production server
 gunicorn==22.0.0
 
-# PostgreSQL driver (required on Render Postgres)
+# PostgreSQL driver
 psycopg2-binary==2.9.9
 
-# SocketIO async support (choose ONE – eventlet is lighter & works well)
-eventlet==0.36.1
-# gevent==24.2.1   # <-- uncomment if you prefer gevent instead of eventlet
+# SocketIO async (use eventlet 0.33.3 or gevent for Python 3.12 compatibility)
+eventlet==0.33.3           # <-- pinned to stable version that works with 3.12
+# gevent==24.2.1           # <-- alternative (uncomment if eventlet fails)
 
-# Utilities
-python-dotenv==1.0.1
-bcrypt==4.2.0
-alembic==1.13.1          # usually pulled by Flask-Migrate, but explicit is safer
-
-# Optional – for better performance/logging (not required)
+# Optional – for stability
 Werkzeug==3.0.3
