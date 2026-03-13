@@ -1,26 +1,23 @@
-# config.py – Fixed version with auto-created instance folder
+# config.py
 import os
-from dotenv import load_dotenv
+from datetime import timedelta
 
+# Load environment variables from .env file (for local dev)
+from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-me'
-    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'jwt-secret-change-me'
-    
-    # === FIX: Ensure instance folder exists ===
-    BASE_DIR = os.path.abspath(os.path.dirname(__file__))           # project root
-    INSTANCE_DIR = os.path.join(BASE_DIR, 'instance')
-    
-    # Create the folder if it doesn't exist (safe on every run)
-    os.makedirs(INSTANCE_DIR, exist_ok=True)
-    
-    # Now use absolute path inside instance/
-    DB_PATH = os.path.join(INSTANCE_DIR, 'simply.db')
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
+    # Secret keys (use strong random values in production!)
+    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-me-immediately')
+    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'jwt-secret-change-me')
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)
+
+    # Database – use PostgreSQL on Railway, fallback to SQLite for local
+    SQLALCHEMY_DATABASE_URI = os.getenv(
         'DATABASE_URL',
-        f'sqlite:///{DB_PATH}'
+        'sqlite:///simply.db'  # fallback for local development
     )
-    
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_ECHO = os.environ.get('SQL_ECHO', 'False') == 'True'  # debug SQL
+
+    # Other settings
+    DEBUG = os.getenv('FLASK_DEBUG', 'False') == 'True'
