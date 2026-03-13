@@ -1,0 +1,4 @@
+# After editing models.py
+python -m flask db migrate -m "Short description of change e.g. Add polls table"
+# Review the generated file in migrations/versions/ (make sure it looks right)
+python -m flask db upgrade
