@@ -20,12 +20,11 @@
 #  along with this program.  If not, see https://www.gnu.org/licenses/.
 
 from flask_socketio import emit, join_room
-
-from extensions import socketio
-from extensions import db
-from models.member import Member
-from models.message import Message
 from datetime import datetime
+
+from extensions import db
+from models.message import Message
+from models.member import Member  # ← FIXED: missing import (required for to_dict)
 
 def init_socket_handlers(socketio):
     @socketio.on('connect')
@@ -53,6 +52,7 @@ def init_socket_handlers(socketio):
             emit('error', {'message': 'Missing required fields'})
             return
 
+        # Verify sender belongs to the user/system
         member = Member.query.filter_by(id=sender_member_id, user_id=user_id).first()
         if not member:
             print(f"[CHAT ERROR] Invalid sender: member {sender_member_id} not owned by user {user_id}")
