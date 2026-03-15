@@ -23,19 +23,18 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from extensions import db
-from models.user import User
+from models.user import User  # Make sure you have a User model
 
 profile_bp = Blueprint('profile', __name__)
 
-@app.route('/api/user/profile', methods=['GET', 'PATCH'])
+@profile_bp.route('/user/profile', methods=['GET', 'PATCH'])
 @jwt_required()
 def user_profile():
     user_id = int(get_jwt_identity())
-    user = User.query.get(user_id)  # This line can return None if ID invalid
-    if user is None:
-        return jsonify({"error": "User not found"}), 404
+    user = User.query.get_or_404(user_id)
 
     if request.method == 'GET':
+        print(f"[PROFILE GET] Fetched for user {user_id}")
         return jsonify({
             "id": user.id,
             "email": user.email,
