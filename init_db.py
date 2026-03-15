@@ -1,8 +1,10 @@
-# init_db.py – one-time DB table creation for Render
-from app import db, create_app
+# init_db.py – One-time script to create all tables in the database
+# Run this manually on Render console or as part of first deploy
 
-app = create_app()
+from app import create_app, db  # Import the factory and db instance
+
+app = create_app()  # This creates the Flask app and initializes db, extensions, etc.
 
 with app.app_context():
     db.create_all()
-    print("All tables created successfully!")
+    print("All database tables created successfully!")
