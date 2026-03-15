@@ -44,17 +44,18 @@ def create_app():
     # Initialize extensions
     db.init_app(app)
     jwt.init_app(app)
-    migrate.init_app(app, db)  # Enables flask db commands (migrations)
+    migrate.init_app(app, db)
+
+    # Socket.IO: use 'threading' mode on Render (stable, no monkey patching needed)
     socketio.init_app(
         app,
         cors_allowed_origins="*",
         logger=True,
         engineio_logger=True,
-        async_mode='eventlet'  # or 'gevent' — eventlet usually works best
+        async_mode='threading'  # ← FIXED: force threading (works everywhere)
     )
 
-    # CORS: allow all origins + credentials for development
-    # Tighten this in production (e.g. specific origins only)
+    # CORS: allow all for dev; tighten in production
     CORS(app, resources={
         r"/*": {
             "origins": "*",
@@ -63,7 +64,7 @@ def create_app():
         }
     })
 
-    # Register all REST API blueprints under /api prefix
+    # Register REST blueprints
     app.register_blueprint(auth_bp, url_prefix='/api')
     app.register_blueprint(profile_bp, url_prefix='/api')
     app.register_blueprint(members_bp, url_prefix='/api')
@@ -71,11 +72,10 @@ def create_app():
     app.register_blueprint(front_history_bp, url_prefix='/api')
     app.register_blueprint(messages_bp, url_prefix='/api')
 
-    # Register Socket.IO event handlers
+    # Register Socket.IO handlers
     init_socket_handlers(socketio)
 
-    # Optional: auto-create tables in debug mode (local dev only)
-    # Do NOT rely on this in production — use migrations or init script
+    # Auto-create tables in debug mode (local dev only)
     if app.debug:
         with app.app_context():
             db.create_all()
@@ -83,8 +83,7 @@ def create_app():
 
     return app
 
-
-# For local development: run directly
+# For local development
 if __name__ == '__main__':
     app = create_app()
     socketio.run(
