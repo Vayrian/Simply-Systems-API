@@ -27,14 +27,15 @@ from models.user import User
 
 profile_bp = Blueprint('profile', __name__)
 
-@profile_bp.route('/user/profile', methods=['GET', 'PATCH'])
+@app.route('/api/user/profile', methods=['GET', 'PATCH'])
 @jwt_required()
 def user_profile():
     user_id = int(get_jwt_identity())
-    user = User.query.get_or_404(user_id)
+    user = User.query.get(user_id)  # This line can return None if ID invalid
+    if user is None:
+        return jsonify({"error": "User not found"}), 404
 
     if request.method == 'GET':
-        print(f"[PROFILE GET] Fetched for user {user_id}")
         return jsonify({
             "id": user.id,
             "email": user.email,

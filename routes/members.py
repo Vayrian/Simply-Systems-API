@@ -19,7 +19,6 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program.  If not, see https://www.gnu.org/licenses/.
 
-
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime
@@ -48,6 +47,14 @@ def members():
         if not name:
             return jsonify({"error": "Name is required"}), 422
 
+        # Parse birthday safely (optional field)
+        birthday = None
+        if data.get('birthday'):
+            try:
+                birthday = datetime.strptime(data['birthday'], '%Y-%m-%d').date()
+            except ValueError:
+                return jsonify({"error": "Invalid birthday format (use YYYY-MM-DD)"}), 400
+
         member = Member(
             user_id=user_id,
             name=name,
@@ -56,7 +63,7 @@ def members():
             color=data.get('color'),
             age_range=data.get('age_range'),
             role=data.get('role'),
-            birthday=datetime.strptime(data['birthday'], '%Y-%m-%d').date() if data.get('birthday') else None,
+            birthday=birthday,
             bio=data.get('bio'),
             icon_emoji=data.get('icon_emoji'),
             avatar_url=data.get('avatar_url')
@@ -65,6 +72,7 @@ def members():
         db.session.commit()
 
         return jsonify(member.to_dict()), 201
+
 
 @members_bp.route('/members/<int:member_id>', methods=['PATCH', 'DELETE'])
 @jwt_required()
@@ -96,11 +104,14 @@ def member_detail(member_id):
             member.age_range = data['age_range']
         if 'role' in data:
             member.role = data['role']
-        if 'birthday' in data and data['birthday']:
-            try:
-                member.birthday = datetime.strptime(data['birthday'], '%Y-%m-%d').date()
-            except ValueError:
-                return jsonify({"error": "Invalid birthday format (use YYYY-MM-DD)"}), 400
+        if 'birthday' in data:
+            if data['birthday']:
+                try:
+                    member.birthday = datetime.strptime(data['birthday'], '%Y-%m-%d').date()
+                except ValueError:
+                    return jsonify({"error": "Invalid birthday format (use YYYY-MM-DD)"}), 400
+            else:
+                member.birthday = None
         if 'bio' in data:
             member.bio = data['bio']
         if 'icon_emoji' in data:
