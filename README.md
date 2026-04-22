@@ -6,7 +6,7 @@ Built with **Python + Flask** (modular routes/models/extensions) and designed fo
 **Current status**: Online-only. All data stored on server (SQLite for dev, PostgreSQL for production).
 
 ## Updates
-**I have stopped development for the most part on this project. If it gets enough attention, I will pick development back up and develop more features. Let me know if I shoudl continue development or not : )**
+**I have stopped development for the most part on this project. If it gets enough attention, I will pick development back up and develop more features. Let me know if I should continue development or not : )**
 
 
 ## Current Features
